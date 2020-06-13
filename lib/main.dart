@@ -334,7 +334,7 @@ class MyTextInputState extends State<SecondRoute>{
   //String result1="",result2=""
   @override
   Widget build(BuildContext context){
-    return new Scaffold(
+    return new Scaffold(resizeToAvoidBottomPadding: false,
       appBar: new AppBar(title: new Text('Profile🔩'),
         backgroundColor:Colors.deepOrange),
       body: new Container(
