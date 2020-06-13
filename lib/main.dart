@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';import 'dart:convert';
 
 String result1="",result2="";
 void main() {
@@ -116,22 +117,29 @@ class _State extends State<MyApp> {
                         Future authenticate(String uname, String passw) async {
                         var client = http.Client();
                         String myurl =
-                            "http://142.93.54.209:8282/login?passw="+password+"&uname="+uname;
+                            "https://drivemesafe.herokuapp.com/login?passw="+password+"&uname="+uname;
                         http.Response response =await client.get(myurl);
                         print(response.body+"dfsfd");
-                        if(response.body=="1"){
+                        Map<String, dynamic> map = jsonDecode(response.body); // import 'dart:convert';
+
+                        String runame = map['name'];
+
+
+                        if(runame==uname){
+                        result1 = map['conno'];
+                        result2  = map['emgno'];
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => FirstRoute(username: username)),
                         );
                         }
                         else{
-                          print("222222");
+                          //print("222222");
                           showDialog(
                             context: context,
                             builder: (BuildContext context){
                                 return AlertDialog(
-                                  //title: Text("Alert Dialog"),
+                                  title: Text(""),
                                   content: Text("Invalid Credentials"),
                                   actions: [FlatButton( child: Text("Close"), onPressed: (){Navigator.of(context).pop();}, ),]
                                 );
