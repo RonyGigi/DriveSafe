@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 String result1="",result2="";
 void main() {
   runApp(MaterialApp(
@@ -15,7 +17,25 @@ class _State extends State<MyApp> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   String  username="";
+  String password='123456789';
+  String email='mrmodh10@gmail.com';
 
+// authenticate(String email, String pass) async {
+//     String myurl =
+//         "here pass your url";
+//     http.post(myurl, headers: {
+//       'Accept': 'application/json',
+//       'authorization': 'pass your key(optional)'
+//     }, body: {
+//       "email": email,
+//       "password": pass
+//     }).then((response) {
+//       print(response.statusCode);
+//       print(response.body);     
+
+//   }
+//     );
+// }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,13 +99,96 @@ class _State extends State<MyApp> {
                       color: Colors.blue,
                       child: Text('Login'),
                       onPressed: () {
-                        print(nameController.text);
-                        print(passwordController.text);
-                        username=nameController.text;
+
+
+                        username=(nameController.text);
+                        password=(passwordController.text);
+
+                        
+                          Future initiate() async {
+                          var client = http.Client();
+                          http.Response response = await client.get(
+                            'https://news.ycombinator.com'
+                          );
+
+                          print(response.body);
+                        }
+                        Future authenticate(String uname, String passw) async {
+                        var client = http.Client();
+                        String myurl =
+                            "http://142.93.54.209:8282/login?passw="+password+"&uname="+uname;
+                        http.Response response =await client.get(myurl);
+                        print(response.body+"dfsfd");
+                        if(response.body=="1"){
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => FirstRoute(username: username)),
                         );
+                        }
+                        else{
+                          print("222222");
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context){
+                                return AlertDialog(
+                                  //title: Text("Alert Dialog"),
+                                  content: Text("Invalid Credentials"),
+                                  actions: [FlatButton( child: Text("Close"), onPressed: (){Navigator.of(context).pop();}, ),]
+                                );
+                            }
+                          );
+                        }
+                        //, headers: {
+                        //  'Accept': 'application/json',
+                          //'authorization': 'pass your key(optional)'
+                        // }, body: {
+                        //   "email": email,
+                        //   "password": pass
+                        // 
+                        //},
+                        // )
+                        // .then((response) {
+                        //   print(response.statusCode);
+                        //   print(response.body);  
+                          
+                        //                         }
+                        //);
+                        // String x=resp.toString();
+                        // print(x);
+                        // if(x=="1"){
+                        //   print("123");
+                        // }
+                    }
+                    
+                    // if(response.body as String =="0")
+                    //       {
+                    //         print(response.body+" 0");
+                    //         return "0";
+                    //       }
+                    //       else
+                    //       {
+                    //         print(response.body+" 1");
+                    //         return "1";
+                    //       }
+                    //enticate(email, password)
+                    // if(authenticate(username, password)  =="1")
+                    // {
+                    //                           Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (context) => FirstRoute(username: username)),
+                    //     );
+                    // }
+                    // else
+                    // {
+                    //   print("2nd");
+                    //   showAlertDialog(context);  
+                    // }
+                    ( authenticate(username, password));
+
+
+                        // username=nameController.text;
+
+
                       },
                     )),
               /*  Container(
