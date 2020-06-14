@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:audioplayers/audio_cache.dart';
 
 String result1="",result2="";
 void main() {
@@ -415,7 +416,7 @@ class ThirdRoute extends StatefulWidget {
 
 class _ThirdRoute extends State<ThirdRoute> {
   Timer _timer;
-  int b;
+  int b=0;
 // class ThirdRoute extends StatelessWidget {
   @override
   void initState() {
@@ -426,9 +427,19 @@ class _ThirdRoute extends State<ThirdRoute> {
   }
 
   void pro() async{
-    b=0;
-      _timer = Timer.periodic(Duration(seconds: 5), (timer) async{
+    //b=0;
+      _timer = Timer.periodic(Duration(seconds: 15), (timer) async{
       print(b);
+      var client = http.Client();
+      String myurl =
+          "https://drivemesafe.herokuapp.com/state";
+      http.Response response =await client.get(myurl);
+      print(response.body);
+      if(response.body.contains("Drowsy")){
+      AudioCache player = new AudioCache();
+      const alarmAudioPath = "sound.mp3";
+      player.play(alarmAudioPath);
+      }
       setState(() {
       b+=1;
       });
