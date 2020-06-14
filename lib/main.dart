@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';import 'dart:convert';
+import 'dart:convert';
+import 'dart:async';
 
 String result1="",result2="";
 void main() {
@@ -105,15 +106,6 @@ class _State extends State<MyApp> {
                         username=(nameController.text);
                         password=(passwordController.text);
 
-                        
-                          Future initiate() async {
-                          var client = http.Client();
-                          http.Response response = await client.get(
-                            'https://news.ycombinator.com'
-                          );
-
-                          print(response.body);
-                        }
                         Future authenticate(String uname, String passw) async {
                         var client = http.Client();
                         String myurl =
@@ -123,8 +115,6 @@ class _State extends State<MyApp> {
                         Map<String, dynamic> map = jsonDecode(response.body); // import 'dart:convert';
 
                         String runame = map['name'];
-
-
                         if(runame==uname){
                         result1 = map['conno'];
                         result2  = map['emgno'];
@@ -253,15 +243,15 @@ class _State extends State<MyApp> {
 
 
 class SecondRoute extends StatefulWidget{
-  // final String username;
-  // SecondPage({this.username});
+  final String username;
+  SecondRoute({this.username});
   @override
-  MyTextInputState createState() => new MyTextInputState();
+  MyTextInputState createState() => new MyTextInputState(username: username);
 }
 
 
 class FirstRoute extends StatelessWidget {
-  final String username;
+  String username;
   FirstRoute({this.username});
   @override
   Widget build(BuildContext context) {
@@ -272,7 +262,7 @@ class FirstRoute extends StatelessWidget {
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                new Text('Hello $username'),
+                new Text('Hello $username',style: TextStyle(fontSize: 25),textAlign: TextAlign.start),
                 new IconButton(
                   icon: Icon(Icons.settings_applications,color: Colors.redAccent,),
                   iconSize: 70.0,
@@ -280,7 +270,7 @@ class FirstRoute extends StatelessWidget {
                                 Navigator.pushReplacement(context, route);//Navigator.of(context).pushNamed('/SecondPage');*/
                                 Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => SecondRoute()));
+                          MaterialPageRoute(builder: (context) => SecondRoute(username: username)));
                                 },
                 ),
                 new Text('Set Profile'),
@@ -296,7 +286,9 @@ class FirstRoute extends StatelessWidget {
                 new IconButton(
                   icon: Icon(Icons.close,color: Colors.redAccent,),
                   iconSize: 70.0,
-                  onPressed:  () {Navigator.pop(context);}
+                  onPressed:  () {Navigator.pop(context);
+
+                  }
                 ),
                 new Text('Sign Out')
                 
@@ -311,27 +303,7 @@ class FirstRoute extends StatelessWidget {
 }
 
 
-class ThirdRoute extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: AppBar(title: Text('Drive....'),),
-        body: new Container(
-          child: new Center(
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-              new Text('Lets Drive'),
-              new Image(image: AssetImage('assets/car.gif'))
-              ],
-            ),
-          ),
-        )
-        
-      );
-    
-  }
-}
+
 
 
 
@@ -340,6 +312,8 @@ class MyTextInputState extends State<SecondRoute>{
   final TextEditingController controller1=new TextEditingController()..text=(result1);
   final TextEditingController controller2=new TextEditingController()..text=result2;
   //String result1="",result2=""
+  String username;
+  MyTextInputState({this.username});
   @override
   Widget build(BuildContext context){
     return new Scaffold(resizeToAvoidBottomPadding: false,
@@ -359,12 +333,13 @@ class MyTextInputState extends State<SecondRoute>{
               semanticCounterText:  result1
             ),
             onSubmitted: (String str1){
-              setState(() {
-                result1=str1;
-                //controller1.text='9999';
-                //print("HELOOOO");
-              });
+              // setState(() {
+              //   //result1=str1;
+              //   //controller1.text='9999';
+              //   //print("HELOOOO");
+              // });
             },
+            onChanged: (s) => setState(() => result1 = s),
             controller: controller1,),
           //new Text(result1),
           SizedBox(height: 90),
@@ -376,11 +351,12 @@ class MyTextInputState extends State<SecondRoute>{
               
             ),
             onSubmitted: (String str2){
-              setState(() {
-                result2=str2;
-                //controller2.text='';
-              });
+              // setState(() {
+              //   //result2=str2;
+              //   //controller2.text='';
+              // });
             },
+            onChanged: (s) => setState(() => result2 = s),
             controller: controller2,),
             
           //new Text(result2),
@@ -408,11 +384,75 @@ class MyTextInputState extends State<SecondRoute>{
                           context,
                           MaterialPageRoute(builder: (context) => FirstPage()));
             */
+            print(controller2.text);
+                  Future savedata() async {
+            print(2);
+            var client = http.Client();
+            String myurl =
+                "https://drivemesafe.herokuapp.com/save?emgno="+controller2.text+"&conno="+controller1.text+"&uname="+username;
+            http.Response response =await client.get(myurl);
+            ///print(response.body+"dfsfd");
+
+                  }
+            savedata();
             Navigator.pop(context);
             },
           )
         ],)
       ),)
     ;
+  }
+}
+
+
+
+class ThirdRoute extends StatefulWidget {
+  
+  @override
+  
+  _ThirdRoute createState() => new _ThirdRoute();
+}
+
+class _ThirdRoute extends State<ThirdRoute> {
+  Timer _timer;
+  int b;
+// class ThirdRoute extends StatelessWidget {
+  @override
+  void initState() {
+    super.initState();
+    //print(22222222222222222);
+    pro();
+
+  }
+
+  void pro() async{
+    b=0;
+      _timer = Timer.periodic(Duration(seconds: 5), (timer) async{
+      print(b);
+      setState(() {
+      b+=1;
+      });
+    });
+  }
+  Widget build(BuildContext context) {
+    return  Scaffold(
+        appBar: AppBar(title: Text('Drive....'),leading: new IconButton(
+    icon: new Icon(Icons.arrow_back),
+    onPressed: () {_timer.cancel();Navigator.pop(context);;}),),
+        body: new Container(
+          child: new Center(
+            child: new Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+              new Text('Lets Drive'),
+              new Text('$b'),
+              new Image(image: AssetImage('assets/car.gif'))
+              ],
+            ),
+          ),
+        )
+        
+      );
+    
   }
 }
